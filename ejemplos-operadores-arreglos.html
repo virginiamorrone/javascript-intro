@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejemplos de JavaScript: operadores y colecciones</title>
+<style>
+  :root {
+    --fondo: #f4f5f7;
+    --superficie: #ffffff;
+    --texto: #15171c;
+    --suave: #5d6270;
+    --linea: #d9dce3;
+    --js: #f0c419;
+    --js-texto: #2a2300;
+    --consola: #1b1e24;
+    --consola-texto: #e6e8ec;
+    --consola-titulo: #f0c419;
+    --consola-error: #f2908a;
+    --codigo: "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --fondo: #111317;
+      --superficie: #1b1e24;
+      --texto: #eceef2;
+      --suave: #a0a6b3;
+      --linea: #2e333d;
+      --consola: #0b0c0f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header { padding: 1.2rem clamp(1rem, 3vw, 2rem) .4rem; }
+  h1 { margin: 0 0 .3rem; font-size: clamp(1.4rem, 3vw, 2rem); }
+  header p { margin: 0; color: var(--suave); }
+
+  .controles {
+    display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+    padding: 1rem clamp(1rem, 3vw, 2rem);
+  }
+  .pestana, .accion {
+    font: inherit; padding: .5rem 1rem; cursor: pointer;
+    border: 1px solid var(--linea); background: var(--superficie); color: var(--texto);
+    border-radius: 6px;
+  }
+  .pestana[aria-selected="true"] { background: var(--js); color: var(--js-texto); border-color: var(--js); font-weight: 600; }
+  .separador { flex: 1; }
+  .accion.principal { background: var(--texto); color: var(--fondo); border-color: var(--texto); font-weight: 600; }
+  button:focus-visible, textarea:focus-visible { outline: 3px solid var(--js); outline-offset: 2px; }
+
+  main {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    padding: 0 clamp(1rem, 3vw, 2rem) 2rem;
+    height: calc(100vh - 150px); min-height: 420px;
+  }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } .panel { height: 60vh; } }
+  .panel { display: flex; flex-direction: column; min-height: 0; }
+  .panel h2 { font-size: .95rem; font-weight: 600; color: var(--suave); margin: 0 0 .4rem; }
+  textarea, #salida {
+    flex: 1; width: 100%; margin: 0; padding: 1rem;
+    font-family: var(--codigo); font-size: .9rem; line-height: 1.55;
+    border-radius: 6px; tab-size: 2;
+  }
+  textarea {
+    resize: none; border: 1px solid var(--linea);
+    background: var(--superficie); color: var(--texto); white-space: pre; overflow: auto;
+  }
+  #salida {
+    background: var(--consola); color: var(--consola-texto);
+    overflow: auto; white-space: pre-wrap; word-break: break-word;
+  }
+  #salida .titulo { color: var(--consola-titulo); font-weight: 600; }
+  #salida .error { color: var(--consola-error); }
+  #salida .vacio { color: #8a909c; }
+
+  /* Sin ligaduras: que <= se vea como dos caracteres, igual que se tipea */
+  pre, code, textarea, #salida, .equiv td {
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Operadores y colecciones en JavaScript</h1>
+  <p>Elegí un ejemplo, tocá Ejecutar y mirá el resultado. Podés editar el código y volver a ejecutarlo.</p>
+</header>
+
+<div class="controles">
+  <div role="tablist" aria-label="Ejemplos">
+    <button class="pestana" role="tab" data-ejemplo="operadores" aria-selected="true">Operadores</button>
+    <button class="pestana" role="tab" data-ejemplo="colecciones" aria-selected="false">Colecciones</button>
+  </div>
+  <span class="separador"></span>
+  <button class="accion" id="restaurar">Restaurar código original</button>
+  <button class="accion" id="limpiar">Limpiar salida</button>
+  <button class="accion principal" id="ejecutar">▶ Ejecutar (Ctrl + Enter)</button>
+</div>
+
+<main>
+  <section class="panel">
+    <h2>Código</h2>
+    <textarea id="editor" spellcheck="false" aria-label="Código JavaScript"></textarea>
+  </section>
+  <section class="panel">
+    <h2>Salida (consola)</h2>
+    <div id="salida" aria-live="polite"><span class="vacio">Tocá Ejecutar para ver el resultado.</span></div>
+  </section>
+</main>
+
+<!-- Códigos de ejemplo (type="text/plain" para que NO se ejecuten solos) -->
+<script type="text/plain" id="codigo-operadores">
+// =============================================
+//  OPERADORES EN JAVASCRIPT
+//  Ejecutar con: node operadores.js
+// =============================================
+
+// ---------- 1. Aritméticos ----------
+console.log("--- 1. Aritméticos ---");
+const a = 10;
+const b = 3;
+
+console.log("Suma:", a + b);            // 13
+console.log("Resta:", a - b);           // 7
+console.log("Multiplicación:", a * b);  // 30
+console.log("División:", a / b);        // 3.333...
+console.log("Resto (módulo):", a % b);  // 1  -> sirve para saber si un número es par
+console.log("Potencia:", a ** 2);       // 100
+
+// ---------- 2. Asignación ----------
+console.log("\n--- 2. Asignación ---");
+let puntos = 10;
+puntos += 5;   // es lo mismo que: puntos = puntos + 5
+console.log("Después de += 5:", puntos);   // 15
+puntos -= 3;   // puntos = puntos - 3
+console.log("Después de -= 3:", puntos);   // 12
+puntos *= 2;   // puntos = puntos * 2
+console.log("Después de *= 2:", puntos);   // 24
+puntos++;      // suma 1
+console.log("Después de ++:", puntos);     // 25
+puntos--;      // resta 1
+console.log("Después de --:", puntos);     // 24
+
+// ---------- 3. Comparación ----------
+console.log("\n--- 3. Comparación ---");
+console.log("5 > 3:", 5 > 3);       // true
+console.log("5 <= 3:", 5 <= 3);     // false
+console.log("5 == '5':", 5 == "5");   // true  -> convierte el tipo (evitar)
+console.log("5 === '5':", 5 === "5"); // false -> compara valor Y tipo (recomendado)
+console.log("5 !== '5':", 5 !== "5"); // true
+
+// ---------- 4. Lógicos ----------
+console.log("\n--- 4. Lógicos ---");
+const tieneEntrada = true;
+const esMayor = false;
+
+console.log("Y (&&):", tieneEntrada && esMayor); // false: ambas deben ser true
+console.log("O (||):", tieneEntrada || esMayor); // true: alcanza con una
+console.log("NO (!):", !esMayor);                // true: invierte el valor
+
+// Ejemplo práctico
+const edad = 20;
+const conDocumento = true;
+if (edad >= 18 && conDocumento) {
+  console.log("Puede ingresar");
+}
+
+// ---------- 5. Ternario (un if en una línea) ----------
+console.log("\n--- 5. Ternario ---");
+const nota = 7;
+const resultado = nota >= 6 ? "Aprobado" : "Reprobado";
+console.log(`Nota ${nota}: ${resultado}`);
+
+const numero = 8;
+console.log(`${numero} es ${numero % 2 === 0 ? "par" : "impar"}`);
+
+// ---------- 6. Texto (concatenación) ----------
+console.log("\n--- 6. Texto ---");
+const nombre = "Ana";
+console.log("Hola, " + nombre + "!");  // con +
+console.log(`Hola, ${nombre}!`);       // con template literal (más claro)
+console.log("Cuidado:", "5" + 1);      // "51" -> si hay texto, + une
+console.log("Cuidado:", "5" - 1);      // 4    -> - siempre resta
+
+// ---------- 7. Modernos: ?? y ?. ----------
+console.log("\n--- 7. Operadores modernos ---");
+
+// ?? (nullish): usa un valor por defecto si el otro es null o undefined
+const apodo = null;
+console.log("Apodo:", apodo ?? "Sin apodo");
+
+// ?. (encadenamiento opcional): evita errores si algo no existe
+const usuario = { nombre: "Luis" };          // no tiene "direccion"
+console.log("Ciudad:", usuario.direccion?.ciudad); // undefined, sin error
+// usuario.direccion.ciudad  -> esto daría TypeError
+
+// ---------- 8. typeof ----------
+console.log("\n--- 8. typeof ---");
+console.log(typeof 42);        // number
+console.log(typeof "hola");    // string
+console.log(typeof true);      // boolean
+console.log(typeof [1, 2]);    // object  (los arrays son objetos)
+console.log(typeof undefined); // undefined
+</script>
+
+<script type="text/plain" id="codigo-colecciones">
+// =============================================
+//  COLECCIONES EN JAVASCRIPT
+//  Ejecutar con: node colecciones.js
+// =============================================
+
+// =============================================
+//  1. ARRAYS (listas ordenadas)
+// =============================================
+console.log("===== 1. ARRAYS =====");
+
+const frutas = ["manzana", "banana", "naranja"];
+
+// Acceder por posición (empieza en 0)
+console.log("Primera:", frutas[0]);                  // manzana
+console.log("Última:", frutas[frutas.length - 1]);   // naranja
+console.log("Cantidad:", frutas.length);             // 3
+
+// Agregar y quitar
+frutas.push("kiwi");       // agrega al final
+frutas.unshift("pera");    // agrega al principio
+console.log("Después de agregar:", frutas);
+
+frutas.pop();              // quita el último
+frutas.shift();            // quita el primero
+console.log("Después de quitar:", frutas);
+
+// Buscar
+console.log("¿Tiene banana?", frutas.includes("banana")); // true
+console.log("Posición de naranja:", frutas.indexOf("naranja")); // 2
+
+// Recorrer
+console.log("\nRecorrer con for...of:");
+for (const fruta of frutas) {
+  console.log("-", fruta);
+}
+
+console.log("\nRecorrer con forEach (con índice):");
+frutas.forEach((fruta, indice) => {
+  console.log(`${indice + 1}. ${fruta}`);
+});
+
+// =============================================
+//  2. MÉTODOS ÚTILES DE ARRAYS
+// =============================================
+console.log("\n===== 2. MÉTODOS DE ARRAYS =====");
+
+const numeros = [4, 9, 2, 7, 10, 5];
+
+// map: transforma cada elemento -> devuelve un array nuevo
+const dobles = numeros.map(n => n * 2);
+console.log("map (dobles):", dobles);
+
+// filter: se queda con los que cumplen la condición
+const mayoresA5 = numeros.filter(n => n > 5);
+console.log("filter (> 5):", mayoresA5);
+
+// find: devuelve el PRIMERO que cumple
+const primerPar = numeros.find(n => n % 2 === 0);
+console.log("find (primer par):", primerPar);
+
+// reduce: acumula todos en un solo valor
+const suma = numeros.reduce((total, n) => total + n, 0);
+console.log("reduce (suma):", suma);
+
+// sort: ordena (¡modifica el original! por eso copiamos con [...])
+const ordenados = [...numeros].sort((x, y) => x - y);
+console.log("sort (ascendente):", ordenados);
+console.log("Original intacto:", numeros);
+
+// =============================================
+//  3. OBJETOS (pares clave: valor)
+// =============================================
+console.log("\n===== 3. OBJETOS =====");
+
+const alumno = {
+  nombre: "Ana",
+  edad: 22,
+  curso: "JavaScript",
+  aprobado: true
+};
+
+// Acceder
+console.log("Nombre:", alumno.nombre);       // notación de punto
+console.log("Curso:", alumno["curso"]);      // notación de corchetes
+
+// Agregar, modificar y borrar
+alumno.email = "ana@ejemplo.com";  // agrega
+alumno.edad = 23;                  // modifica
+delete alumno.aprobado;            // borra
+console.log("Objeto actualizado:", alumno);
+
+// Recorrer
+console.log("\nClaves:", Object.keys(alumno));
+console.log("Valores:", Object.values(alumno));
+
+console.log("\nRecorrer con for...in:");
+for (const clave in alumno) {
+  console.log(`${clave}: ${alumno[clave]}`);
+}
+
+// =============================================
+//  4. ARRAY DE OBJETOS (lo más común en la vida real)
+// =============================================
+console.log("\n===== 4. ARRAY DE OBJETOS =====");
+
+const productos = [
+  { nombre: "Teclado", precio: 1500, stock: 10 },
+  { nombre: "Mouse", precio: 800, stock: 0 },
+  { nombre: "Monitor", precio: 9000, stock: 3 },
+  { nombre: "Auriculares", precio: 2500, stock: 5 }
+];
+
+// Solo los que tienen stock
+const disponibles = productos.filter(p => p.stock > 0);
+console.log("Disponibles:", disponibles.map(p => p.nombre));
+
+// Solo los nombres
+const nombres = productos.map(p => p.nombre);
+console.log("Nombres:", nombres);
+
+// Buscar uno
+const monitor = productos.find(p => p.nombre === "Monitor");
+console.log("Precio del monitor:", monitor.precio);
+
+// Valor total del inventario
+const totalInventario = productos.reduce((total, p) => total + p.precio * p.stock, 0);
+console.log("Valor total del inventario:", totalInventario);
+
+// =============================================
+//  5. SET (valores sin repetir)
+// =============================================
+console.log("\n===== 5. SET =====");
+
+const etiquetas = new Set(["js", "web", "js", "html", "web"]);
+console.log("Set:", etiquetas);               // repetidos eliminados
+console.log("Tamaño:", etiquetas.size);       // 3
+etiquetas.add("css");
+console.log("¿Tiene 'html'?", etiquetas.has("html"));
+
+// Truco clásico: quitar duplicados de un array
+const conRepetidos = [1, 2, 2, 3, 3, 3];
+const sinRepetidos = [...new Set(conRepetidos)];
+console.log("Sin repetidos:", sinRepetidos);
+
+// =============================================
+//  6. MAP (clave -> valor, con métodos propios)
+// =============================================
+console.log("\n===== 6. MAP =====");
+
+const stock = new Map();
+stock.set("manzana", 50);
+stock.set("banana", 30);
+stock.set("naranja", 0);
+
+console.log("Stock de banana:", stock.get("banana"));
+console.log("¿Hay kiwi?", stock.has("kiwi"));
+console.log("Cantidad de productos:", stock.size);
+
+for (const [fruta, cantidad] of stock) {
+  console.log(`${fruta}: ${cantidad}`);
+}
+
+// =============================================
+//  7. SPREAD (...) Y DESESTRUCTURACIÓN
+// =============================================
+console.log("\n===== 7. SPREAD Y DESESTRUCTURACIÓN =====");
+
+// Unir arrays
+const frutas2 = ["uva", "mango"];
+const todas = [...frutas, ...frutas2];
+console.log("Unidas:", todas);
+
+// Copiar y extender un objeto
+const alumnoConNota = { ...alumno, nota: 9 };
+console.log("Copia extendida:", alumnoConNota);
+
+// Desestructurar: sacar valores a variables
+const [primera, segunda] = frutas;
+console.log("Primera y segunda:", primera, segunda);
+
+const { nombre, curso } = alumno;
+console.log(`${nombre} estudia ${curso}`);
+</script>
+
+<script>
+  const editor = document.getElementById("editor");
+  const salida = document.getElementById("salida");
+  const originales = {
+    operadores: document.getElementById("codigo-operadores").textContent.trim() + "\n",
+    colecciones: document.getElementById("codigo-colecciones").textContent.trim() + "\n"
+  };
+  const editados = { ...originales };
+  let ejemploActual = "operadores";
+
+  // ---- Convierte cualquier valor a texto, parecido a como lo muestra Node.js ----
+  function formatear(valor, anidado = false) {
+    if (typeof valor === "string") return anidado ? `'${valor}'` : valor;
+    if (valor === null) return "null";
+    if (valor === undefined) return "undefined";
+    if (typeof valor === "function") return `[Function: ${valor.name || "anónima"}]`;
+    if (Array.isArray(valor)) {
+      return `[ ${valor.map(v => formatear(v, true)).join(", ")} ]`;
+    }
+    if (valor instanceof Set) {
+      return `Set(${valor.size}) { ${[...valor].map(v => formatear(v, true)).join(", ")} }`;
+    }
+    if (valor instanceof Map) {
+      const pares = [...valor].map(([k, v]) => `${formatear(k, true)} => ${formatear(v, true)}`);
+      return `Map(${valor.size}) { ${pares.join(", ")} }`;
+    }
+    if (typeof valor === "object") {
+      const pares = Object.entries(valor).map(([k, v]) => `${k}: ${formatear(v, true)}`);
+      return pares.length ? `{ ${pares.join(", ")} }` : "{}";
+    }
+    return String(valor);
+  }
+
+  function escribir(texto, clase) {
+    const linea = document.createElement("div");
+    if (clase) linea.className = clase;
+    linea.textContent = texto;
+    salida.appendChild(linea);
+  }
+
+  function ejecutar() {
+    salida.innerHTML = "";
+    const logOriginal = console.log;
+
+    // Redirigimos console.log para que escriba en la página (y también en la consola real)
+    console.log = (...args) => {
+      logOriginal(...args);
+      const texto = args.map(a => formatear(a)).join(" ");
+      const esTitulo = /^\n?(=====|---)/.test(texto);
+      escribir(texto, esTitulo ? "titulo" : "");
+    };
+
+    try {
+      // new Function ejecuta el código en su propio espacio,
+      // así las variables de un ejemplo no chocan con las del otro
+      new Function(editor.value)();
+    } catch (error) {
+      escribir(`${error.name}: ${error.message}`, "error");
+    } finally {
+      console.log = logOriginal;
+    }
+    salida.scrollTop = 0;
+  }
+
+  function cambiarEjemplo(nombre) {
+    editados[ejemploActual] = editor.value;
+    ejemploActual = nombre;
+    editor.value = editados[nombre];
+    document.querySelectorAll(".pestana").forEach(p => {
+      p.setAttribute("aria-selected", p.dataset.ejemplo === nombre);
+    });
+    salida.innerHTML = '<span class="vacio">Tocá Ejecutar para ver el resultado.</span>';
+  }
+
+  document.querySelectorAll(".pestana").forEach(p => {
+    p.addEventListener("click", () => cambiarEjemplo(p.dataset.ejemplo));
+  });
+  document.getElementById("ejecutar").addEventListener("click", ejecutar);
+  document.getElementById("limpiar").addEventListener("click", () => { salida.innerHTML = ""; });
+  document.getElementById("restaurar").addEventListener("click", () => {
+    editor.value = originales[ejemploActual];
+    editados[ejemploActual] = editor.value;
+  });
+
+  editor.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); ejecutar(); }
+    if (e.key === "Tab") {  // Tab inserta espacios en vez de saltar de campo
+      e.preventDefault();
+      const ini = editor.selectionStart;
+      editor.setRangeText("  ", ini, editor.selectionEnd, "end");
+    }
+  });
+
+  editor.value = originales.operadores;
+</script>
+</body>
+</html>

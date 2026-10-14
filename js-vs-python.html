@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JavaScript vs Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #f4f5f7;
+    --superficie: #ffffff;
+    --texto: #15171c;
+    --suave: #5d6270;
+    --linea: #d9dce3;
+    --js: #f0c419;
+    --js-texto: #2a2300;
+    --py: #3467a8;
+    --py-texto: #ffffff;
+    --py-suave: #dbe6f4;
+    --js-suave: #fbf0c2;
+    --error: #b3261e;
+    --ok: #1f7a4d;
+    --titulos: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --codigo: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --fondo: #111317;
+      --superficie: #1b1e24;
+      --texto: #eceef2;
+      --suave: #a0a6b3;
+      --linea: #2e333d;
+      --py: #5b8fd6;
+      --py-texto: #0d1420;
+      --py-suave: #1c2a3f;
+      --js-suave: #3a3210;
+      --error: #f2908a;
+      --ok: #6cc59c;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: var(--titulos);
+    overflow: hidden;
+  }
+
+  /* ===== Diapositivas ===== */
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: clamp(1.5rem, 5vw, 5rem) clamp(1.5rem, 7vw, 7rem) 5rem;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+  }
+  .slide.activa { display: flex; animation: entrar .35s ease-out; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(8px); } }
+  @media (prefers-reduced-motion: reduce) { .slide.activa { animation: none; } }
+
+  h1, h2 { margin: 0 0 1.5rem; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+  h1 { font-size: clamp(2.8rem, 9vw, 7rem); }
+  h2 { font-size: clamp(2rem, 4.5vw, 3.4rem); }
+  p, li { font-size: clamp(1.05rem, 1.8vw, 1.45rem); line-height: 1.5; max-width: 60ch; }
+  .suave { color: var(--suave); }
+
+  /* Portada */
+  .portada h1 .js { background: var(--js); color: var(--js-texto); padding: 0 .18em; }
+  .portada h1 .py { background: var(--py); color: var(--py-texto); padding: 0 .18em; }
+  .portada h1 .vs { font-weight: 400; color: var(--suave); font-size: .5em; vertical-align: middle; margin: 0 .2em; }
+
+  /* Dos columnas */
+  .columnas { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 2.5rem); }
+  @media (max-width: 760px) { .columnas { grid-template-columns: 1fr; } }
+  .lado { padding: 1.4rem 1.6rem; background: var(--superficie); border-top: 6px solid; }
+  .lado.js { border-color: var(--js); }
+  .lado.py { border-color: var(--py); }
+  .lado h3 { margin: 0 0 .6rem; font-size: clamp(1.3rem, 2.4vw, 1.9rem); }
+  .lado p { margin: .3rem 0; }
+  .anio { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1; margin-bottom: .4rem; }
+
+  /* Código */
+  pre {
+    margin: 0;
+    padding: 1.2rem 1.4rem;
+    background: var(--superficie);
+    font-family: var(--codigo);
+    font-size: clamp(.85rem, 1.5vw, 1.15rem);
+    line-height: 1.6;
+    overflow-x: auto;
+    border-left: 6px solid;
+  }
+  pre.js { border-color: var(--js); }
+  pre.py { border-color: var(--py); }
+  .etiqueta { font-weight: 600; margin-bottom: .5rem; font-size: 1.05rem; }
+  .com { color: var(--suave); }
+  .res-error { color: var(--error); }
+  .res-ok { color: var(--ok); }
+
+  /* Tabla */
+  .tabla-contenedor { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: clamp(.9rem, 1.5vw, 1.2rem); }
+  th, td { text-align: left; padding: .7rem 1rem; border-bottom: 1px solid var(--linea); vertical-align: top; }
+  th { font-weight: 600; }
+  th.js { background: var(--js); color: var(--js-texto); }
+  th.py { background: var(--py); color: var(--py-texto); }
+  td:first-child { color: var(--suave); white-space: nowrap; }
+  td code, li code, p code { font-family: var(--codigo); font-size: .9em; }
+
+  /* Equivalencias */
+  .equiv td { font-family: var(--codigo); }
+  .equiv td:first-child { font-family: var(--titulos); }
+
+  /* Cierre */
+  .conceptos { display: flex; flex-wrap: wrap; gap: .8rem; margin: 1rem 0 2rem; padding: 0; list-style: none; }
+  .conceptos li {
+    background: var(--superficie);
+    border: 1px solid var(--linea);
+    padding: .5rem 1.1rem;
+    border-radius: 999px;
+  }
+
+  /* ===== Controles ===== */
+  .barra {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .8rem clamp(1rem, 4vw, 2.5rem);
+    background: var(--fondo);
+    z-index: 10;
+  }
+  .progreso { flex: 1; height: 4px; background: var(--linea); }
+  .progreso div { height: 100%; width: 0; background: linear-gradient(90deg, var(--js), var(--py)); transition: width .3s; }
+  .barra button {
+    font: inherit;
+    font-size: 1.1rem;
+    width: 2.6rem; height: 2.6rem;
+    border: 1px solid var(--linea);
+    background: var(--superficie);
+    color: var(--texto);
+    cursor: pointer;
+  }
+  .barra button:disabled { opacity: .35; cursor: default; }
+  .barra button:focus-visible { outline: 3px solid var(--py); outline-offset: 2px; }
+  #numero { font-family: var(--codigo); font-size: .95rem; color: var(--suave); min-width: 4.5ch; text-align: right; }
+
+  /* Sin ligaduras: que <= se vea como dos caracteres, igual que se tipea */
+  pre, code, textarea, #salida, .equiv td {
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- 1. Portada -->
+<section class="slide portada">
+  <h1><span class="js">JavaScript</span><span class="vs">vs</span><br><span class="py">Python</span></h1>
+  <p class="suave">Dos lenguajes para empezar a programar: en qué se parecen, en qué se diferencian y cuándo conviene cada uno.</p>
+</section>
+
+<!-- 2. Orígenes -->
+<section class="slide">
+  <h2>Dos orígenes distintos</h2>
+  <div class="columnas">
+    <div class="lado py">
+      <div class="anio">1991</div>
+      <h3>Python</h3>
+      <p>Creado por Guido van Rossum con una idea central: que el código sea fácil de leer, casi como pseudocódigo.</p>
+    </div>
+    <div class="lado js">
+      <div class="anio">1995</div>
+      <h3>JavaScript</h3>
+      <p>Creado por Brendan Eich en Netscape para darle comportamiento a las páginas web dentro del navegador.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Dónde se usan -->
+<section class="slide">
+  <h2>¿Dónde se usa cada uno?</h2>
+  <div class="columnas">
+    <div class="lado js">
+      <h3>JavaScript</h3>
+      <p>Páginas y aplicaciones web (frontend).</p>
+      <p>Servidores con Node.js (backend).</p>
+      <p>Apps móviles y de escritorio.</p>
+      <p class="suave">Funciona en cualquier navegador sin instalar nada.</p>
+    </div>
+    <div class="lado py">
+      <h3>Python</h3>
+      <p>Ciencia de datos e inteligencia artificial.</p>
+      <p>Automatización de tareas y scripts.</p>
+      <p>Backend web con Django o Flask.</p>
+      <p class="suave">Necesita instalar el intérprete de Python.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Tabla comparativa -->
+<section class="slide">
+  <h2>Comparación rápida</h2>
+  <div class="tabla-contenedor">
+    <table>
+      <thead>
+        <tr><th></th><th class="js">JavaScript</th><th class="py">Python</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Bloques de código</td><td>Llaves <code>{ }</code></td><td>Indentación obligatoria</td></tr>
+        <tr><td>Tipado</td><td>Dinámico y débil</td><td>Dinámico y fuerte</td></tr>
+        <tr><td>Asincronía</td><td>Central: eventos, <code>async/await</code></td><td>Existe, se usa menos</td></tr>
+        <tr><td>Curva de aprendizaje</td><td>Algo irregular</td><td>Más suave</td></tr>
+        <tr><td>Paquetes</td><td>npm</td><td>pip</td></tr>
+        <tr><td>Frameworks conocidos</td><td>React, Vue, Express</td><td>Django, Flask, pandas</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 5. Mismo programa -->
+<section class="slide">
+  <h2>El mismo programa, dos lenguajes</h2>
+  <div class="columnas">
+    <div>
+      <div class="etiqueta">JavaScript</div>
+<pre class="js">const nombre = "Ana";
+let edad = 25;
+
+function saludar(persona) {
+  return `Hola, ${persona}`;
+}
+
+if (edad &gt;= 18) {
+  console.log(saludar(nombre));
+}</pre>
+    </div>
+    <div>
+      <div class="etiqueta">Python</div>
+<pre class="py">nombre = "Ana"
+edad = 25
+
+def saludar(persona):
+    return f"Hola, {persona}"
+
+if edad &gt;= 18:
+    print(saludar(nombre))</pre>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Equivalencias -->
+<section class="slide">
+  <h2>Diccionario de equivalencias</h2>
+  <div class="tabla-contenedor">
+    <table class="equiv">
+      <thead>
+        <tr><th></th><th class="js">JavaScript</th><th class="py">Python</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Mostrar en pantalla</td><td>console.log()</td><td>print()</td></tr>
+        <tr><td>Declarar variable</td><td>const / let</td><td>nombre = valor</td></tr>
+        <tr><td>Función</td><td>function</td><td>def</td></tr>
+        <tr><td>Texto con variables</td><td>`Hola ${x}`</td><td>f"Hola {x}"</td></tr>
+        <tr><td>Verdadero / falso</td><td>true / false</td><td>True / False</td></tr>
+        <tr><td>Valor vacío</td><td>null</td><td>None</td></tr>
+        <tr><td>Comentario</td><td>// texto</td><td># texto</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 7. Tipado -->
+<section class="slide">
+  <h2>Ojo con el tipado</h2>
+  <p class="suave">JavaScript intenta convertir tipos por su cuenta. Python prefiere avisarte con un error.</p>
+  <div class="columnas">
+    <div>
+      <div class="etiqueta">JavaScript</div>
+<pre class="js">"5" + 1   <span class="com">// "51"  (une textos)</span>
+"5" - 1   <span class="com">// 4     (resta números)</span>
+
+5 == "5"  <span class="com">// true  (convierte)</span>
+5 === "5" <span class="res-ok">// false (recomendado)</span></pre>
+    </div>
+    <div>
+      <div class="etiqueta">Python</div>
+<pre class="py">"5" + 1
+<span class="res-error"># TypeError: can only
+# concatenate str to str</span>
+
+int("5") + 1  <span class="res-ok"># 6</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- 8. Indentación -->
+<section class="slide">
+  <h2>La sangría importa (en Python)</h2>
+  <div class="columnas">
+    <div>
+      <div class="etiqueta">JavaScript: solo estética</div>
+<pre class="js">if (edad &gt;= 18) {
+console.log("Mayor");
+      console.log("de edad");
+}
+<span class="res-ok">// Funciona igual (pero es feo)</span></pre>
+    </div>
+    <div>
+      <div class="etiqueta">Python: cambia el significado</div>
+<pre class="py">if edad &gt;= 18:
+print("Mayor")
+<span class="res-error"># IndentationError:
+# expected an indented block</span></pre>
+    </div>
+  </div>
+  <p class="suave">Python obliga a escribir ordenado desde el primer día.</p>
+</section>
+
+<!-- 9. Cuál elegir -->
+<section class="slide">
+  <h2>¿Cuál elegir?</h2>
+  <div class="columnas">
+    <div class="lado js">
+      <h3>Elegí JavaScript si…</h3>
+      <p>Querés hacer páginas o aplicaciones web.</p>
+      <p>Te motiva ver resultados visuales rápido.</p>
+      <p>Querés empezar sin instalar nada.</p>
+    </div>
+    <div class="lado py">
+      <h3>Elegí Python si…</h3>
+      <p>Te interesan los datos o la inteligencia artificial.</p>
+      <p>Querés automatizar tareas.</p>
+      <p>Buscás la sintaxis más amable para empezar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10. Cierre -->
+<section class="slide">
+  <h2>Lo importante se traslada</h2>
+  <p>Cambia la forma de escribirlo, pero los conceptos de fondo son los mismos en los dos lenguajes:</p>
+  <ul class="conceptos">
+    <li>Variables</li>
+    <li>Tipos de datos</li>
+    <li>Condiciones</li>
+    <li>Bucles</li>
+    <li>Funciones</li>
+    <li>Listas y objetos</li>
+  </ul>
+  <p class="suave">Aprender bien uno hace mucho más fácil aprender el otro.</p>
+</section>
+
+<!-- Barra de navegación -->
+<nav class="barra" aria-label="Navegación de diapositivas">
+  <button id="anterior" aria-label="Diapositiva anterior">‹</button>
+  <button id="siguiente" aria-label="Diapositiva siguiente">›</button>
+  <div class="progreso"><div id="barra-progreso"></div></div>
+  <span id="numero"></span>
+  <button id="pantalla" aria-label="Pantalla completa" title="Pantalla completa (F)">⛶</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll(".slide");
+  const btnAnterior = document.getElementById("anterior");
+  const btnSiguiente = document.getElementById("siguiente");
+  const numero = document.getElementById("numero");
+  const progreso = document.getElementById("barra-progreso");
+  let actual = 0;
+
+  function mostrar(indice) {
+    actual = Math.max(0, Math.min(indice, slides.length - 1));
+    slides.forEach((s, i) => s.classList.toggle("activa", i === actual));
+    numero.textContent = `${actual + 1} / ${slides.length}`;
+    progreso.style.width = `${((actual + 1) / slides.length) * 100}%`;
+    btnAnterior.disabled = actual === 0;
+    btnSiguiente.disabled = actual === slides.length - 1;
+  }
+
+  function pantallaCompleta() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  }
+
+  btnAnterior.addEventListener("click", () => mostrar(actual - 1));
+  btnSiguiente.addEventListener("click", () => mostrar(actual + 1));
+  document.getElementById("pantalla").addEventListener("click", pantallaCompleta);
+
+  document.addEventListener("keydown", (e) => {
+    if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); mostrar(actual + 1); }
+    if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); mostrar(actual - 1); }
+    if (e.key === "Home") mostrar(0);
+    if (e.key === "End") mostrar(slides.length - 1);
+    if (e.key === "f" || e.key === "F") pantallaCompleta();
+  });
+
+  mostrar(0);
+</script>
+</body>
+</html>
