@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi primer programa con JavaScript</title>
+
+  <!-- Vinculamos la hoja de estilos (la apariencia) -->
+  <link rel="stylesheet" href="estilos.css">
+
+  <!-- Vinculamos el JavaScript (el comportamiento).
+       "defer" hace que se descargue ya, pero que se ejecute
+       recién cuando todo el HTML terminó de cargarse. -->
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <!-- HTML: la estructura de la página -->
+  <main class="tarjeta">
+    <h1>¡Hola, Mundo!</h1>
+
+    <label for="nombre">Escribe tu nombre</label>
+    <input type="text" id="nombre" placeholder="Por ejemplo: Ana">
+
+    <button id="boton-saludar">Saludar</button>
+
+    <p id="mensaje"></p>
+    <p id="contador">Saludos enviados: 0</p>
+  </main>
+
+</body>
+</html>
